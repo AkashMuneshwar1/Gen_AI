@@ -20,12 +20,15 @@ def generate():
     prompt = data.get("prompt", "")
 
     inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(**inputs, max_length=100)
+    outputs = model.generate(
+        **inputs,
+        max_length=200,  # Increased length
+        temperature=0.9,  # Adds randomness
+        top_p=0.9,  # Limits word selection to high-probability words
+        repetition_penalty=1.2,  # Avoids repeating the same phrase
+    )
+    
     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-    # Validate if the response is relevant
-    if prompt.lower() not in generated_text.lower():
-        return jsonify({"generated_text": "❌ Not valid. The query is not in the trained model."})
 
     return jsonify({"generated_text": generated_text})
 
